@@ -28,7 +28,13 @@ class TransactionController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $input = $request->all();
+        $input['user_id'] = '1';
+        $transaction = new Transaction($input);
+        if (!$transaction->save()) {
+            return back()->with('error', 'Transaction failed to create.');
+        }
+        return back()->with('success', 'Transaction created successfully.');
     }
 
     /**
