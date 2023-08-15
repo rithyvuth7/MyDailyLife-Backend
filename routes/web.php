@@ -18,4 +18,4 @@ Route::get('/', function () {
     return view('home');
 });
 
-Route::resource('transactions', TransactionController::class)->only(['index', 'store']);
+Route::resource('/transactions', TransactionController::class);
