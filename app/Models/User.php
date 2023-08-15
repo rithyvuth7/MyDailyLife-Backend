@@ -112,4 +112,10 @@ class User extends Authenticatable
         $cash = $cashIn - $cashOut;
         return $cash ?? 0;
     }
+
+    public function getRemarks(): array
+    {
+        $remarks = $this->transactions()->distinct('remark')->pluck('remark')->toArray();
+        return $remarks ?? [];
+    }
 }
