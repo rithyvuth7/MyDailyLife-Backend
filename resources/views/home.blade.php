@@ -1,33 +1,116 @@
-<!doctype html>
-<html lang="kh">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>MyDailyLife</title>
-    <link rel="stylesheet" href="{{ '/bootstrap/css/bootstrap.min.css' }}">
-    <link rel="stylesheet" href="{{ '/bootstrap/font/bootstrap-icons.css' }}">
-    <link rel="stylesheet" href="{{ '/bootstrap/font/bootstrap-icon-sizes.css' }}">
-    <script src="{{ '/bootstrap/js/popper.min.js' }}"></script>
-    <script src="{{ '/bootstrap/js/bootstrap.min.js' }}"></script>
-    <link rel="stylesheet" href="{{ '/css/custom.css' }}">
+
+@extends('layouts.app')
+<?php
+$user = \App\Models\User::find(1);
+?>
+@section('content')
+    <div class="container">
+        <div class="card">
+            <h1 class="card-title">My Money Tracking</h1>
+            <div class="card-text">
+                <div class="card">
+                    <div class="card-body">
+                        <h3 class="card-text">Cash <i class="bi bi-cash"></i></h3>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">{{ number_format($user->getCashKHR()) . ' KHR'}}</li>
+                            <li class="list-group-item">{{ number_format($user->getCashUSD()) . ' USD'}}</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <h3 class="card-text">Bank <i class="bi bi-bank"></i></h3>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">{{ number_format($user->getBankBalancesKHR()) . ' KHR'}}</li>
+                            <li class="list-group-item">{{ number_format($user->getBankBalancesUSD()) . ' USD'}}</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">Transaction</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form action="{{ route('transactions.store') }}" method="post">
+                    @csrf
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="staticBackdropLabel">New Transaction</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label pe-5">Currency</label>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" id="currency1" name="currency" checked value="KHR">
+                                <label class="form-check-label" for="currency1">KHR</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" id="currency2" name="currency" value="USD">
+                                <label class="form-check-label" for="currency2">USD</label>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" for="amount">Amount</label>
+                            <div class="input-group mb-3">
+                                <input type="number" class="form-control" id="amount" name="amount" required>
+                                <span class="input-group-text" id="basic-addon2">KHR</span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label pe-5">Type</label>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" id="type1" checked name="type" value="in">
+                                <label class="form-check-label" for="type1">Money In</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" id="type2" name="type" value="out">
+                                <label class="form-check-label" for="type2">Money Out</label>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label pe-5">Money Type</label>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" id="money_type1" name="money_type" checked value="cash">
+                                <label class="form-check-label" for="money_type1">Cash</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" id="money_type2" name="money_type" value="bank">
+                                <label class="form-check-label" for="money_type2">Bank</label>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" for="remark">Remark</label>
+                            <select class="form-control form-select" id="remark" name="remark" required>
+                                <option value="">Select Remark Or Add New</option>
+                                @foreach($user->getRemarks() as $remark)
+                                    <option value="{{ $remark }}">{{ $remark }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+@endsection
+@section('style')
 
     <style>
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background-image: url("/img/ds.jpg");
-            background-size: cover;
-            background-repeat: no-repeat;
-            background-position: center;
-            font-family: Arial, sans-serif;
-            /*color: #fff;*/
-        }
 
         .container {
-            max-width: 400px;
+            max-width: 500px;
             padding: 20px;
             text-align: center;
         }
@@ -101,137 +184,8 @@
             display: inline-block;
         }
     </style>
-</head>
-<?php
-$user = \App\Models\User::find(1);
-?>
-<body>
-<div class="container">
-    <div class="card">
-        <h1 class="card-title">My Money Tracking</h1>
-        <div class="card-text">
-            <div class="card">
-                <div class="card-body">
-                    <h3 class="card-text">Cash <i class="bi bi-cash"></i></h3>
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item">{{ number_format($user->getCashKHR()) . ' KHR'}}</li>
-                        <li class="list-group-item">{{ number_format($user->getCashUSD()) . ' USD'}}</li>
-                    </ul>
-                </div>
-            </div>
-            <div class="card">
-                <div class="card-body">
-                    <h3 class="card-text">Bank <i class="bi bi-bank"></i></h3>
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item">{{ number_format($user->getBankBalancesKHR()) . ' KHR'}}</li>
-                        <li class="list-group-item">{{ number_format($user->getBankBalancesUSD()) . ' USD'}}</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-        <div class="card-footer">
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">Transaction</button>
-        </div>
-    </div>
-</div>
+@endsection
 
-<!-- Modal -->
-<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <form action="{{ route('transactions.store') }}" method="post">
-                @csrf
-                <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="staticBackdropLabel">New Transaction</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label pe-5">Currency</label>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" id="currency1" name="currency" checked value="KHR">
-                            <label class="form-check-label" for="currency1">KHR</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" id="currency2" name="currency" value="USD">
-                            <label class="form-check-label" for="currency2">USD</label>
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label" for="amount">Amount</label>
-                        <div class="input-group mb-3">
-                            <input type="number" class="form-control" id="amount" name="amount" required>
-                            <span class="input-group-text" id="basic-addon2">KHR</span>
-                        </div>
-                    </div>
+@section('script')
 
-                    <div class="mb-3">
-                        <label class="form-label pe-5">Type</label>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" id="type1" checked name="type" value="in">
-                            <label class="form-check-label" for="type1">Money In</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" id="type2" name="type" value="out">
-                            <label class="form-check-label" for="type2">Money Out</label>
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label pe-5">Money Type</label>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" id="money_type1" name="money_type" checked value="cash">
-                            <label class="form-check-label" for="money_type1">Cash</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" id="money_type2" name="money_type" value="bank">
-                            <label class="form-check-label" for="money_type2">Bank</label>
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label" for="remark">Remark</label>
-                        <select class="form-control form-select" id="remark" name="remark" required>
-                            <option value="">Select Remark Or Add New</option>
-                            @foreach($user->getRemarks() as $remark)
-                                <option value="{{ $remark }}">{{ $remark }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">Submit</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<script src="{{ '/bootstrap/js/bootstrap.min.js' }}"></script>
-<script src="{{ '/js/jquery.min.js' }}"></script>
-<script src="{{ '/js/selectize.min.js' }}"></script>
-<link rel="stylesheet" href="{{ '/css/selectize.bootstrap5.css' }}">
-<script>
-    $(document).ready(function (){
-        $('select[multiple][required]').selectize({
-            plugins: ['remove_button', 'clear_button'],
-            create: true,
-            sortField: 'text'
-        });
-        $('select').selectize({
-            plugins: ['remove_button', 'clear_button'],
-            create: true,
-            sortField: 'text'
-        });
-    });
-    $(document).ready(function (){
-        $('#currency1').on('click', function (){
-            $('#basic-addon2').text('KHR');
-        });
-        $('#currency2').on('click', function (){
-            $('#basic-addon2').text('USD');
-        });
-    });
-
-</script>
-</body>
-</html>
+@endsection
